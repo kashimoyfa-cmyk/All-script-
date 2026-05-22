@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id"> 
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -131,7 +131,8 @@
         }
 
         input[type="text"],
-        textarea {
+        textarea,
+        select {
             flex: 1;
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -145,7 +146,8 @@
         }
 
         input[type="text"]:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             outline: none;
             border-color: var(--accent);
         }
@@ -240,6 +242,41 @@
             user-select: none;
         }
 
+        /* Checkbox Grid */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--surface2);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--accent);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        .checkbox-item label {
+            cursor: pointer;
+            flex: 1;
+            margin: 0;
+        }
+
         /* Notification */
         .toast {
             position: fixed;
@@ -269,6 +306,7 @@
             .btn-row { flex-direction: column; }
             .btn { width: 100%; }
             .input-row { flex-direction: column; }
+            .checkbox-grid { grid-template-columns: 1fr; }
         }
 
         /* Scrollbar */
@@ -282,7 +320,7 @@
         <!-- Header -->
         <div class="header">
             <div class="logo">BLAST KEY SYSTEM</div>
-            <div class="subtitle">SCRIPT GENERATOR · v1.1</div>
+            <div class="subtitle">SCRIPT GENERATOR · v1.2</div>
         </div>
 
         <!-- Card 1: Konfigurasi Loadstring Keysystem -->
@@ -298,6 +336,67 @@
             </div>
             <div class="btn-row">
                 <button class="btn btn-outline btn-sm" onclick="generateFinal()">🔄 Update Final Script</button>
+            </div>
+        </div>
+
+        <!-- Card 1.5: Key Validation Configuration -->
+        <div class="card">
+            <div class="card-title"><span class="dot" style="background:#f09e3d;"></span> Key Validation Configuration</div>
+            
+            <div class="input-group">
+                <label>Validation Type</label>
+                <select id="validationType">
+                    <option value="none">None (No Validation)</option>
+                    <option value="simple">Simple Key Check</option>
+                    <option value="web">Web-Based Validation</option>
+                    <option value="discord">Discord Webhook</option>
+                    <option value="database">Database Validation</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Validation Features</label>
+                <div class="checkbox-grid">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="expireCheck" checked>
+                        <label for="expireCheck">Expire Check</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hwidCheck" checked>
+                        <label for="hwidCheck">HWID Lock</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="ipCheck">
+                        <label for="ipCheck">IP Lock</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="antiVpn">
+                        <label for="antiVpn">Anti VPN</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="maxUsage">
+                        <label for="maxUsage">Max Usage Limit</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="antiDebug" checked>
+                        <label for="antiDebug">Anti Debug</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Validation Endpoint URL (for web-based)</label>
+                <input type="text" id="validationUrl" placeholder="https://api.example.com/validate">
+            </div>
+
+            <div class="input-group">
+                <label>Max Key Uses</label>
+                <input type="text" id="maxKeyUses" placeholder="Unlimited (leave empty)" value="">
+            </div>
+
+            <div class="input-group">
+                <label>Key Expiration Days</label>
+                <input type="text" id="keyExpireDays" placeholder="Leave empty for no expiration" value="">
             </div>
         </div>
 
@@ -324,6 +423,20 @@
             const keysystemUrl = document.getElementById('keysystemUrl').value.trim();
             const globalVar = document.getElementById('globalVarInput').value.trim() || '_G.BlastKey';
             const scriptInput = document.getElementById('scriptInput').value.trim();
+            
+            // Key Validation Configuration
+            const validationType = document.getElementById('validationType').value;
+            const validationUrl = document.getElementById('validationUrl').value.trim();
+            const maxKeyUses = document.getElementById('maxKeyUses').value.trim();
+            const keyExpireDays = document.getElementById('keyExpireDays').value.trim();
+            
+            // Features
+            const expireCheck = document.getElementById('expireCheck').checked;
+            const hwidCheck = document.getElementById('hwidCheck').checked;
+            const ipCheck = document.getElementById('ipCheck').checked;
+            const antiVpn = document.getElementById('antiVpn').checked;
+            const maxUsage = document.getElementById('maxUsage').checked;
+            const antiDebug = document.getElementById('antiDebug').checked;
 
             if (!keysystemUrl) {
                 showToast('Isi URL Raw Keysystem!', 'error');
@@ -335,19 +448,61 @@
                 return;
             }
 
+            let validationConfig = '';
+            
+            if (validationType !== 'none') {
+                validationConfig = `
+-- KEY VALIDATION CONFIGURATION
+local KeyConfig = {
+    ValidationType = "${validationType}",
+    ValidationUrl = "${validationUrl}",
+    MaxKeyUses = ${maxKeyUses ? maxKeyUses : 'nil'},
+    KeyExpireDays = ${keyExpireDays ? keyExpireDays : 'nil'},
+    Features = {
+        ExpireCheck = ${expireCheck},
+        HWIDLock = ${hwidCheck},
+        IPLock = ${ipCheck},
+        AntiVPN = ${antiVpn},
+        MaxUsageLimit = ${maxUsage},
+        AntiDebug = ${antiDebug}
+    }
+}
+
+-- Validate Key
+local function validateKey()
+    ${validationType === 'web' ? `
+    local response = game:HttpGet(KeyConfig.ValidationUrl .. "?key=" .. ${globalVar})
+    if response ~= "valid" then
+        error("Invalid key!")
+    end
+    ` : ''}
+    
+    ${antiDebug ? `
+    if debug.getinfo then
+        error("Debug detected!")
+    end
+    ` : ''}
+    
+    return true
+end
+
+validateKey()
+`;
+            }
+
             const finalScript = `-- 1. Load Key System
 loadstring(game:HttpGet("${keysystemUrl}"))()
 
 -- 2. Tunggu sampai verified
 repeat task.wait(1) until ${globalVar}
-
+${validationConfig}
 -- 3. Script utama jalan
 print("Key valid, mulai...")
 
 ${scriptInput}`;
 
             document.getElementById('finalPreview').textContent = finalScript;
-            showToast('Final script generated!', 'success');
+            showToast('Final script generated with validation!', 'success');
         }
 
         function copyFinal() {
