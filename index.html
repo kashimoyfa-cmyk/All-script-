@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLAST KEY SYSTEM - Script Generator</title>
+    <style>
+        :root {
+            --bg: #0d0d12;
+            --surface: #15151c;
+            --surface2: #1c1c25;
+            --border: #2a2a35;
+            --text: #e0e0e0;
+            --text2: #9999aa;
+            --accent: #7289da;
+            --accent2: #43b581;
+            --danger: #f04747;
+            --warning: #faa61a;
+            --radius: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 24px 0 8px 0;
+        }
+
+        .header .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #f04747, #faa61a, #f04747);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            animation: flicker 3s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.6; }
+            94% { opacity: 1; }
+            96% { opacity: 0.7; }
+            97% { opacity: 1; }
+        }
+
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--text2);
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent2);
+            display: inline-block;
+        }
+
+        /* Input */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"],
+        textarea {
+            flex: 1;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+            transition: border 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        textarea {
+            min-height: 120px;
+            max-height: 500px;
+        }
+
+        textarea#scriptInput {
+            min-height: 200px;
+        }
+
+        /* Button */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.15s;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #5f73bc;
+        }
+
+        .btn-success {
+            background: var(--accent2);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #3ca374;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--surface2);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Preview */
+        .preview {
+            background: #0a0a0f;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: #c0c0c0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .preview .line-num {
+            color: #555;
+            user-select: none;
+        }
+
+        /* Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .toast.success { background: var(--accent2); color: #fff; }
+        .toast.error { background: var(--danger); color: #fff; }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 0 8px; }
+            .card { padding: 14px; }
+            .btn-row { flex-direction: column; }
+            .btn { width: 100%; }
+            .input-row { flex-direction: column; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">BLAST KEY SYSTEM</div>
+            <div class="subtitle">SCRIPT GENERATOR · v1.1</div>
+        </div>
+
+        <!-- Card 1: Konfigurasi Loadstring Keysystem -->
+        <div class="card">
+            <div class="card-title"><span class="dot"></span> Konfigurasi Loadstring Keysystem</div>
+            <div class="input-group">
+                <label>URL Raw Keysystem (loadstring)</label>
+                <input type="text" id="keysystemUrl" value="https://pastefy.app/fqpOQy7d/raw" placeholder="https://pastefy.app/.../raw">
+            </div>
+            <div class="input-group">
+                <label>Global Variable Setelah Verified</label>
+                <input type="text" id="globalVarInput" value="_G.BlastKey" placeholder="_G.NamaVariable">
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-outline btn-sm" onclick="generateFinal()">🔄 Update Final Script</button>
+            </div>
+        </div>
+
+        <!-- Card 2: Paste Script Utama -->
+        <div class="card">
+            <div class="card-title"><span class="dot" style="background:var(--accent);"></span> Script Utama Kamu</div>
+            <textarea id="scriptInput" placeholder="Paste script utama kamu disini..."></textarea>
+        </div>
+
+        <!-- Card 3: Final Output -->
+        <div class="card">
+            <div class="card-title"><span class="dot" style="background:var(--accent2);"></span> Final Script (Keysystem + Script Utama)</div>
+            <div class="preview" id="finalPreview">// Output akan muncul disini setelah generate...</div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="generateFinal()">⚡ GENERATE FINAL SCRIPT</button>
+                <button class="btn btn-success" onclick="copyFinal()">📋 COPY FINAL SCRIPT</button>
+                <button class="btn btn-outline" onclick="downloadScript()">💾 DOWNLOAD .LUA</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateFinal() {
+            const keysystemUrl = document.getElementById('keysystemUrl').value.trim();
+            const globalVar = document.getElementById('globalVarInput').value.trim() || '_G.BlastKey';
+            const scriptInput = document.getElementById('scriptInput').value.trim();
+
+            if (!keysystemUrl) {
+                showToast('Isi URL Raw Keysystem!', 'error');
+                return;
+            }
+
+            if (!scriptInput) {
+                showToast('Paste script utama kamu dulu!', 'error');
+                return;
+            }
+
+            const finalScript = `-- 1. Load Key System
+loadstring(game:HttpGet("${keysystemUrl}"))()
+
+-- 2. Tunggu sampai verified
+repeat task.wait(1) until ${globalVar}
+
+-- 3. Script utama jalan
+print("Key valid, mulai...")
+
+${scriptInput}`;
+
+            document.getElementById('finalPreview').textContent = finalScript;
+            showToast('Final script generated!', 'success');
+        }
+
+        function copyFinal() {
+            const text = document.getElementById('finalPreview').textContent;
+            if (!text || text.includes('// Output akan muncul')) {
+                showToast('Generate final script dulu!', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Final script dicopy!', 'success');
+            }).catch(() => {
+                showToast('Gagal copy!', 'error');
+            });
+        }
+
+        function downloadScript() {
+            const text = document.getElementById('finalPreview').textContent;
+            if (!text || text.includes('// Output akan muncul')) {
+                showToast('Generate final script dulu!', 'error');
+                return;
+            }
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'blast_script_' + Date.now() + '.lua';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Script didownload!', 'success');
+        }
+
+        function showToast(msg, type) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
